@@ -80,7 +80,7 @@ public class LightExit {
     }
 
     private static void showMaze(Maze maze) {
-        System.out.println("Maze dimensions: (" + maze.getDimensions()[0] + "," + maze.getDimensions()[1] + ")");
+        System.out.println("Maze dimensions: " + maze.getDimensions()[0] + "X" + maze.getDimensions()[1]);
 
         for (int i = 0; i < maze.getMirrors().size(); i++) {
             Mirror mirrorToDisplay = maze.getMirrors().get(i);
@@ -147,8 +147,8 @@ public class LightExit {
     private static boolean checkIfValidSquarePosition(String line, String[] dimensionArray) {
         line = line.replaceAll("[^\\d,]", "");
         String[] dimArray = line.split(",");
-        Boolean rowCheck = Integer.parseInt(dimArray[0]) > Integer.parseInt(dimensionArray[0]);
-        Boolean colCheck = Integer.parseInt(dimArray[1]) > Integer.parseInt(dimensionArray[1]);
+        Boolean rowCheck = Integer.parseInt(dimArray[0]) > (Integer.parseInt(dimensionArray[0])-1);
+        Boolean colCheck = Integer.parseInt(dimArray[1]) > (Integer.parseInt(dimensionArray[1])-1);
         return rowCheck || colCheck;
     }
 }
