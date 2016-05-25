@@ -1,7 +1,7 @@
 package data;
 
 /**
- * Created by bp94845 on 5/25/2016.
+ * Created by Bimal Paul on 5/25/2016.
  */
 public class LightPath {
     public String[] coordinates;
