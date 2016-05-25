@@ -1,4 +1,5 @@
 # How to run? 
+* Clone!
 * Import Project into IntelliJ/ IDEA as JAVA project
 * Right click `src/LightExit.java` - Hit Run - the console should show the results
 
