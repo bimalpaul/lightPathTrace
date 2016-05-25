@@ -1,3 +1,7 @@
+# Main - `src/LighExit.java`
+
+* Comments added in class
+
 # Data structures
 
 ### 1. `src/data/LightPath.java`
