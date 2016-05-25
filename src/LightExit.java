@@ -16,17 +16,18 @@ import java.util.Scanner;
 public class LightExit {
     public static void main(String[] args) throws IOException {
 
-        String fileName = "C:\\bench\\git\\bimalpaul\\mirrorMaze\\exampleFiles\\file1.txt";
+        String fileName = "C:\\bench\\git\\bimalpaul\\mirrorMaze\\exampleFiles\\file1.txt";  // This is the path of the file to be test. \ escaped
         if (fileName.length() == 0) {
             throw new RuntimeException("Need a file name!");
         }
         Scanner fileScanner = setup(fileName);
-        recognizeInputPattern(fileScanner);
+        Maze maze = recognizeInputPattern(fileScanner);
+        showMaze(maze);
     }
 
     private static Scanner setup(String fileName) throws IOException {
-        FileReader fileReader = new FileReader(fileName);
-        return (new Scanner(fileReader));
+        FileReader fileReader = new FileReader(fileName);  // initialize fileReader with filePath
+        return (new Scanner(fileReader)); // initialize fileScanner with fileReader
     }
 
     private static Maze recognizeInputPattern(Scanner scanner) {
@@ -34,59 +35,30 @@ public class LightExit {
         List<Mirror> mirrors = new ArrayList<>();
         LightPath entryPoint = new LightPath();
         int inputIndex = 0;
-        Boolean invalidFile = true;
+        Boolean invalidFile = true; // bool to check for validity of file
         String[] dimensionArray = new String[2];
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             if (line.startsWith("-1")) {
-                inputIndex++;
+                inputIndex++; // number of inputs is calculated by number of -1s
                 if (scanner.hasNext()) {
                     line = scanner.nextLine();
                 }
             }
 
             if (inputIndex == 0) {
-                dimensionArray = line.split(",");
-                if (dimensionArray.length != 2) {
+                dimensionArray = line.split(",");  // split first line to get dimensions
+                if (dimensionArray.length != 2) {  // length should always be 2
                     throw new RuntimeException("Dimension array not specified properly. Please change file contents. It should be of format row count, column count");
                 }
             }
 
             if (inputIndex == 1) {
-                Boolean bothSidesReflective = false;
-                String reflectiveSide = "";
-                String mirrorDirection = "";
                 invalidFile = checkIfValidSquarePosition(line, dimensionArray);
                 if (invalidFile) {
                     throw new RuntimeException("Invalid input. Check mirror placement coordinates");
                 }
-
-                Mirror mirror = new Mirror();
-
-                String mirrorWithoutDirection = line.replaceAll("[^\\d,]", "");
-                String[] mirrorPosition = mirrorWithoutDirection.split(",");
-                mirror.setCoordinates(mirrorPosition);
-
-                String mirrorDirectionAndOrientation = line.replaceAll("[^\\D],", "");
-                String[] mirrorDirectionAndOrientationArray = mirrorDirectionAndOrientation.split("");
-
-
-                if (mirrorDirectionAndOrientationArray.length > 1) {
-                    mirrorDirection = mirrorDirectionAndOrientationArray[1];
-                    if (mirrorDirectionAndOrientationArray.length > 2) {
-                        reflectiveSide = mirrorDirectionAndOrientationArray[2];
-                    } else {
-                        bothSidesReflective = true;
-                    }
-                } else {
-                    throw new RuntimeException("The direction in which mirror is placed is not specified. Please edit input file.");
-                }
-
-                mirror.setMirrorDirection(mirrorDirection);
-                mirror.setAreBothSidesReflective(bothSidesReflective);
-                if (!bothSidesReflective) {
-                    mirror.setReflectiveSide(reflectiveSide);
-                }
+                Mirror mirror = getMirror(line);
                 mirrors.add(mirror);
             }
 
@@ -96,20 +68,7 @@ public class LightExit {
                 if (invalidFile) {
                     throw new RuntimeException("Invalid input. Check light entry coordinates");
                 }
-
-
-                String entryPointWithoutOrientation = line.replaceAll("[^\\d,]", "");
-                String[] lightEntryPoint = entryPointWithoutOrientation.split(",");
-                entryPoint.setCoordinates(lightEntryPoint);
-
-                String laserOrientation = line.replaceAll("[^\\D],", "");
-                String[] laserArray = laserOrientation.split("");
-                if(laserArray.length < 2) {
-                    throw new RuntimeException("Laser entry orientation not mentioned correctly. Please edit input file.");
-                }
-                 entryPoint.setLaserOrientation(laserArray[1]);
-
-
+                entryPoint = getEntryPoint(line);
             }
 
         }
@@ -117,6 +76,10 @@ public class LightExit {
         maze.setMirrors(mirrors);
         maze.setEntryPoint(entryPoint);
 
+        return maze;
+    }
+
+    private static void showMaze(Maze maze) {
         System.out.println("Maze dimensions: (" + maze.getDimensions()[0] + "," + maze.getDimensions()[1] + ")");
 
         for (int i = 0; i < maze.getMirrors().size(); i++) {
@@ -131,8 +94,54 @@ public class LightExit {
 
         System.out.println("\nLazer entry point: (" + maze.getEntryPoint().getCoordinates()[0] + "," + maze.getEntryPoint().getCoordinates()[1] + ")");
         System.out.println("Lazer entry orientation: " + maze.getEntryPoint().getLaserOrientation());
+    }
 
-        return null;
+    private static LightPath getEntryPoint(String line) {
+        LightPath entryPoint = new LightPath();
+        String entryPointWithoutOrientation = line.replaceAll("[^\\d,]", "");
+        String[] lightEntryPoint = entryPointWithoutOrientation.split(",");
+        entryPoint.setCoordinates(lightEntryPoint);
+
+        String laserOrientation = line.replaceAll("[^\\D],", "");
+        String[] laserArray = laserOrientation.split("");
+        if (laserArray.length < 2) {
+            throw new RuntimeException("Laser entry orientation not mentioned correctly. Please edit input file.");
+        }
+        entryPoint.setLaserOrientation(laserArray[1]);
+        return entryPoint;
+    }
+
+    private static Mirror getMirror(String line) {
+        Boolean bothSidesReflective = false;
+        String reflectiveSide = "";
+        String mirrorDirection = "";
+        Mirror mirror = new Mirror();
+
+        String mirrorWithoutDirection = line.replaceAll("[^\\d,]", "");  // regex to remove all characters other than digits and ,
+        String[] mirrorPosition = mirrorWithoutDirection.split(",");
+        mirror.setCoordinates(mirrorPosition);
+
+        String mirrorDirectionAndOrientation = line.replaceAll("[^\\D],", ""); // regex to remove all number and ,
+        String[] mirrorDirectionAndOrientationArray = mirrorDirectionAndOrientation.split("");
+
+
+        if (mirrorDirectionAndOrientationArray.length > 1) {
+            mirrorDirection = mirrorDirectionAndOrientationArray[1];
+            if (mirrorDirectionAndOrientationArray.length > 2) {
+                reflectiveSide = mirrorDirectionAndOrientationArray[2];
+            } else {
+                bothSidesReflective = true;
+            }
+        } else {
+            throw new RuntimeException("The direction in which mirror is placed is not specified. Please edit input file.");
+        }
+
+        mirror.setMirrorDirection(mirrorDirection);
+        mirror.setAreBothSidesReflective(bothSidesReflective);
+        if (!bothSidesReflective) {
+            mirror.setReflectiveSide(reflectiveSide);
+        }
+        return mirror;
     }
 
     private static boolean checkIfValidSquarePosition(String line, String[] dimensionArray) {
