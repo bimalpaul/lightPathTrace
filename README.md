@@ -3,7 +3,7 @@
 * Right click `src/LightExit.java` - Hit Run - the console should show the results
 
 # Main 
-* src/LighExit.java`
+* `src/LighExit.java`
 * Comments added in class
 
 # Data structures
