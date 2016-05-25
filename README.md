@@ -1,5 +1,9 @@
-# Main - `src/LighExit.java`
+# How to run? 
+* Import Project into IntelliJ/ IDEA as JAVA project
+* Right click `src/LightExit.java` - Hit Run - the console should show the results
 
+# Main 
+* src/LighExit.java`
 * Comments added in class
 
 # Data structures
