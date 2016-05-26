@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.jar.Pack200;
 
 
 public class LightExit {
@@ -90,61 +91,131 @@ public class LightExit {
 
         int xExit = xCord;
         int yExit = yCord;
+        int mirrorIndex = 0;
+        do {
+            if (laserOrientation.equalsIgnoreCase("V")) {
+                // if laser enters vertically - keep changing y coordinates till (x,) matches one of the mirrors (OR) x or y greater than dimensions
+                Mirror mirror = mirrors.get(mirrorIndex);
+                do {
+                    if (yExit == mirror.getCoordinates()[1]) {
+                        // reflect here
+                        // get mirror's reflective side
+                        String reflectiveSide = "";
+                        String mirrorDirection = mirror.getMirrorDirection();
+                        if (!mirror.isAreBothSidesReflective()) {
+                            reflectiveSide = mirror.getReflectiveSide();
+                        } else {
+                            reflectiveSide = "B";
+                        }
 
-        switch (laserOrientation) {
-            case "V": {
-                yExit = yCord;
-                // if laser enters vertically - keep increasing y coordinates till (x,) matches one of the mirrors (OR) x or y greater than dimensions
-                for (Mirror mirror : mirrors) {
-                    do {
-                        if (yExit == mirror.getCoordinates()[1]) {
-                            // reflect here
-                            // get mirror's reflective side
-                            String reflectiveSide = "";
-                            String mirrorDirection = mirror.getMirrorDirection();
-                            if (!mirror.isAreBothSidesReflective()) {
-                                reflectiveSide = mirror.getReflectiveSide();
-                            } else {
-                                reflectiveSide = "B";
-                            }
-                            if (mirrorDirection.equalsIgnoreCase("R")) {
-                                if (reflectiveSide.equalsIgnoreCase("L")) {
-                                    // pass through
+                        if (yCord == 0) {
+                            if (mirrorDirection.equalsIgnoreCase("L")) {
+                                if (reflectiveSide.equalsIgnoreCase("L") || reflectiveSide.equalsIgnoreCase("B")) {
+                                    xExit--;
+                                } else {
                                     yExit++;
+                                }
+                            } else {
+                                if (reflectiveSide.equalsIgnoreCase("R") || reflectiveSide.equalsIgnoreCase("B")) {
+                                    xExit++;
+                                } else {
+                                    yExit++;
+                                }
 
+                            }
+                        } else if (yCord > 0) {
+                            if (mirrorDirection.equalsIgnoreCase("L")) {
+                                if (reflectiveSide.equalsIgnoreCase("L")) {
+                                    yExit--;
                                 } else if (reflectiveSide.equalsIgnoreCase("R") || reflectiveSide.equalsIgnoreCase("B")) {
                                     xExit++;
                                 }
                             } else {
                                 if (reflectiveSide.equalsIgnoreCase("R")) {
-                                    // pass through
-                                    yExit++;
-
+                                    yExit--;
                                 } else if (reflectiveSide.equalsIgnoreCase("L") || reflectiveSide.equalsIgnoreCase("B")) {
                                     xExit--;
                                 }
                             }
-
-
-                        } else if (yExit < mirror.getCoordinates()[1]) {
-                            yExit++;
-                        } else {
-                            // ***should not happen***
                         }
-                    } while (yExit <= mazeYCord && xExit <= mazeXCord && yExit >= 0 && xExit >= 0);
+                    } else {
+                        if (yCord > 0) yExit--;
+                        if (yCord == 0) yExit++;
+                    }
+                } while (yExit <= mazeYCord && xExit <= mazeXCord && yExit >= 0 && xExit >= 0);
+
+                if (mirrors.size() > (mirrorIndex + 1)) {
+                    laserOrientation = "H";
+                    mirrorIndex++;
                 }
-                break;
+
             }
-            case "H": {
-                break;
+            else if (laserOrientation.equalsIgnoreCase("H")) {
+                // if laser enters horizontally - keep changing x coordinates till (,y) matches one of the mirrors (OR) x or y greater than dimensions
+                Mirror mirror = mirrors.get(mirrorIndex);
+                do {
+                    if (xExit == mirror.getCoordinates()[0]) {
+                        // reflect here
+                        // get mirror's reflective side
+                        String reflectiveSide = "";
+                        String mirrorDirection = mirror.getMirrorDirection();
+                        if (!mirror.isAreBothSidesReflective()) {
+                            reflectiveSide = mirror.getReflectiveSide();
+                        } else {
+                            reflectiveSide = "B";
+                        }
+
+                        if (xCord == 0) {
+                            if (mirrorDirection.equalsIgnoreCase("L")) {
+                                if (reflectiveSide.equalsIgnoreCase("L")) {
+                                    yExit++;
+                                } else {
+                                    xExit++;
+                                }
+                            } else {
+                                if (reflectiveSide.equalsIgnoreCase("R")) {
+                                    xExit++;
+                                } else {
+                                    yExit++;
+                                }
+
+                            }
+                        } else if (xCord > 0) {
+                            if (mirrorDirection.equalsIgnoreCase("L")) {
+                                if (reflectiveSide.equalsIgnoreCase("L")) {
+                                    xExit--;
+                                } else if (reflectiveSide.equalsIgnoreCase("R") || reflectiveSide.equalsIgnoreCase("B")) {
+                                    yExit--;
+                                }
+                            } else {
+                                if (reflectiveSide.equalsIgnoreCase("R")) {
+                                    yExit--;
+                                } else if (reflectiveSide.equalsIgnoreCase("L")) {
+                                    xExit--;
+                                }
+                            }
+                        }
+                    } else {
+                        if (xCord > 0) xExit--;
+                        if (xCord == 0) xExit++;
+                    }
+                } while (yExit <= mazeYCord && xExit <= mazeXCord && yExit >= 0 && xExit >= 0);
+
+                if (mirrors.size() > (mirrorIndex + 1)) {
+                    laserOrientation = "V";
+                    mirrorIndex++;
+                }
+
             }
-        }
-        int xExitCord = 0 ;
-        int yExitCord = 0 ;
-        if(xExit > 0) {
+        }while(mirrors.size() >= mirrorIndex);
+
+
+        int xExitCord = 0;
+        int yExitCord = 0;
+        if (xExit > 0) {
             xExitCord = xExit > mazeXCord ? (xExit - 1) : xExit;
         }
-        if(yExit > 0) {
+        if (yExit > 0) {
             yExitCord = yExit > mazeYCord ? (yExit - 1) : yExit;
         }
         System.out.println("xexit : " + xExitCord);
