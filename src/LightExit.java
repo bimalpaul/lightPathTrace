@@ -16,7 +16,7 @@ import java.util.Scanner;
 public class LightExit {
     public static void main(String[] args) throws IOException {
 
-        String fileName = "C:\\bench\\git\\bimalpaul\\mirrorMaze\\exampleFiles\\file1.txt";  // This is the path of the file to be test. \ escaped
+        String fileName = "C:\\bench\\git\\bimalpaul\\lightPathTrace\\exampleFiles\\file1.txt";  // This is the path of the file to be test. \ escaped
         if (fileName.length() == 0) {
             throw new RuntimeException("Need a file name!");
         }
@@ -75,8 +75,61 @@ public class LightExit {
         maze.setDimensions(dimensionArray);
         maze.setMirrors(mirrors);
         maze.setEntryPoint(entryPoint);
+        LightPath exitPoint = tracePath(dimensionArray, mirrors, entryPoint);
 
         return maze;
+    }
+
+    private static LightPath tracePath(String[] dimensionArray, List<Mirror> mirrors, LightPath entryPoint) {
+        String laserOrientation = entryPoint.getLaserOrientation();
+        int xCord = Integer.parseInt(entryPoint.getCoordinates()[0]);
+        int yCord = Integer.parseInt(entryPoint.getCoordinates()[1]);
+
+        int mazeXCord = Integer.parseInt(dimensionArray[0]) - 1; //coordinates start with 0
+        int mazeYCord = Integer.parseInt(dimensionArray[1]) - 1;
+
+        int xExit = xCord;
+        int yExit = yCord;
+
+        switch (laserOrientation) {
+            case "V": {
+                yExit = yCord;
+                // if laser enters vertically - keep increasing y coordinates till (x,) matches one of the mirrors (OR) x or y greater than dimensions
+                for (Mirror mirror : mirrors) {
+                    do {
+                        if (yExit == mirror.getCoordinates()[1]) {
+                            // reflect here
+                            // get mirror's reflective side
+                            String reflectiveSide =  "";
+                            if(!mirror.isAreBothSidesReflective()) {
+                                reflectiveSide = mirror.getReflectiveSide();
+                            } else {
+                                reflectiveSide = "B";
+                            }
+                            if(reflectiveSide.compareToIgnoreCase("L") == 0) {
+                                // pass through
+//                                yExit++;
+                                break;
+
+                            }
+
+                        } else if (yExit < mirror.getCoordinates()[1]) {
+                            yExit++;
+                        } else {
+                            // ***should not happen***
+                        }
+                    } while (yExit <= mazeYCord);
+                }
+                break;
+            }
+            case "H": {
+                break;
+            }
+        }
+        System.out.println("xexit : "+xExit);
+        System.out.println("yexit : "+yExit);
+
+        return null;
     }
 
     private static void showMaze(Maze maze) {
@@ -118,7 +171,13 @@ public class LightExit {
         Mirror mirror = new Mirror();
 
         String mirrorWithoutDirection = line.replaceAll("[^\\d,]", "");  // regex to remove all characters other than digits and ,
-        String[] mirrorPosition = mirrorWithoutDirection.split(",");
+        String[] mirrorPosString = mirrorWithoutDirection.split(",");
+        int mirrorX = Integer.parseInt(mirrorPosString[0]);
+        int mirrorY = Integer.parseInt(mirrorPosString[1]);
+        int[] mirrorPosition = new int[2];
+        mirrorPosition[0] = mirrorX;
+        mirrorPosition[1] = mirrorY;
+
         mirror.setCoordinates(mirrorPosition);
 
         String mirrorDirectionAndOrientation = line.replaceAll("[^\\D],", ""); // regex to remove all number and ,
@@ -147,8 +206,8 @@ public class LightExit {
     private static boolean checkIfValidSquarePosition(String line, String[] dimensionArray) {
         line = line.replaceAll("[^\\d,]", "");
         String[] dimArray = line.split(",");
-        Boolean rowCheck = Integer.parseInt(dimArray[0]) > (Integer.parseInt(dimensionArray[0])-1);
-        Boolean colCheck = Integer.parseInt(dimArray[1]) > (Integer.parseInt(dimensionArray[1])-1);
+        Boolean rowCheck = Integer.parseInt(dimArray[0]) > (Integer.parseInt(dimensionArray[0]) - 1);
+        Boolean colCheck = Integer.parseInt(dimArray[1]) > (Integer.parseInt(dimensionArray[1]) - 1);
         return rowCheck || colCheck;
     }
 }

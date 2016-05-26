@@ -4,16 +4,16 @@ package data;
  * Created by Bimal Paul on 5/25/2016.
  */
 public class Mirror {
-    public String[] coordinates;
+    public int[] coordinates;
     public String mirrorDirection;
     public boolean areBothSidesReflective;
     public String reflectiveSide;
 
-    public String[] getCoordinates() {
+    public int[] getCoordinates() {
         return coordinates;
     }
 
-    public void setCoordinates(String[] coordinates) {
+    public void setCoordinates(int[] coordinates) {
         this.coordinates = coordinates;
     }
 
