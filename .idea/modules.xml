@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/mirrorMaze.iml" filepath="$PROJECT_DIR$/mirrorMaze.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lightPathTrace.iml" filepath="$PROJECT_DIR$/lightPathTrace.iml" />
     </modules>
   </component>
 </project>

@@ -100,25 +100,38 @@ public class LightExit {
                         if (yExit == mirror.getCoordinates()[1]) {
                             // reflect here
                             // get mirror's reflective side
-                            String reflectiveSide =  "";
-                            if(!mirror.isAreBothSidesReflective()) {
+                            String reflectiveSide = "";
+                            String mirrorDirection = mirror.getMirrorDirection();
+                            if (!mirror.isAreBothSidesReflective()) {
                                 reflectiveSide = mirror.getReflectiveSide();
                             } else {
                                 reflectiveSide = "B";
                             }
-                            if(reflectiveSide.compareToIgnoreCase("L") == 0) {
-                                // pass through
-//                                yExit++;
-                                break;
+                            if (mirrorDirection.equalsIgnoreCase("R")) {
+                                if (reflectiveSide.equalsIgnoreCase("L")) {
+                                    // pass through
+                                    yExit++;
 
+                                } else if (reflectiveSide.equalsIgnoreCase("R") || reflectiveSide.equalsIgnoreCase("B")) {
+                                    xExit++;
+                                }
+                            } else {
+                                if (reflectiveSide.equalsIgnoreCase("R")) {
+                                    // pass through
+                                    yExit++;
+
+                                } else if (reflectiveSide.equalsIgnoreCase("L") || reflectiveSide.equalsIgnoreCase("B")) {
+                                    xExit--;
+                                }
                             }
+
 
                         } else if (yExit < mirror.getCoordinates()[1]) {
                             yExit++;
                         } else {
                             // ***should not happen***
                         }
-                    } while (yExit <= mazeYCord);
+                    } while (yExit <= mazeYCord && xExit <= mazeXCord && yExit >= 0 && xExit >= 0);
                 }
                 break;
             }
@@ -126,8 +139,16 @@ public class LightExit {
                 break;
             }
         }
-        System.out.println("xexit : "+xExit);
-        System.out.println("yexit : "+yExit);
+        int xExitCord = 0 ;
+        int yExitCord = 0 ;
+        if(xExit > 0) {
+            xExitCord = xExit > mazeXCord ? (xExit - 1) : xExit;
+        }
+        if(yExit > 0) {
+            yExitCord = yExit > mazeYCord ? (yExit - 1) : yExit;
+        }
+        System.out.println("xexit : " + xExitCord);
+        System.out.println("yexit : " + yExitCord);
 
         return null;
     }
